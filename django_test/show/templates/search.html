@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh_TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static "css/search.css" %}">
+    <title>Document</title>
+  </head>
+  <body>
+    <a href="../show">上一頁</a>
+    <table>
+      <thead>
+        <tr>
+          <th>UID</th>
+          <th>活動名稱</th>
+          <th>活動類別</th>
+          <th>演出單位</th>
+          <th>簡介說明</th>
+          <th>折扣資訊</th>
+          <th>圖片連結</th>
+          <th>售票網址</th>
+          <th>推廣網址</th>
+          <th>備註</th>
+          <th>編輯時間</th>
+          <th>來源網站名稱</th>
+          <th>活動起始日期</th>
+          <th>活動結束日期</th>
+          <th>點閱數</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+            <td >{{uid}}</td>
+            <td>{{title}}</td>
+            <td>{{category.categoryname}}</td>
+            <td>{{showUnit}}</td>
+            <td>{{descriptionFilterHtml}}</td>
+            <td>{{discountInfo}}</td>
+            <td><img src={{imageUrl}}></td>
+            <td><a href={{webSales}}></td>
+            <td>{{sourceWebPromote}}</td>
+            <td>{{comment}}</td>
+            <td>{{editModifyDate}}</td>
+            <td>{{sourceWebID.sourcewebname}}</td>
+            <td>{{startDate}}</td>
+            <td>{{endDate}}</td>
+            <td>{{hitRate}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>主辦單位</p>
+    <ul>
+        {% for i in masterUnit%}
+            <li>{{i}}</li>
+        {% endfor %}
+    </ul>
+    <p>協辦單位<p>
+        {% for i in subUnit%}
+            <li>{{i}}</li>
+        {% endfor %}
+    <p>贊助單位</p>
+        {% for i in supportUnit%}
+            <li>{{i}}</li>
+        {% endfor %}
+    <p>其他單位</p>
+        {% for i in otherUnit%}
+            <li>{{i}}</li>
+        {% endfor %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>演出時間</th>
+          <th>地點</th>
+          <th>場地名稱</th>
+          <th>是否售票</th>
+          <th>緯度</th>
+          <th>經度</th>
+          <th>售票說明</th>
+          <th>結束時間</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for i in showInfo%}
+            <tr>
+              <td>{{i.time}}</td>
+              <td>{{i.location}}</td>
+              <td>{{i.locationname}}</td>
+              <td>{{i.onsales}}</td>
+              {% if i.latitude == None %}
+                <td></td>
+              {% else %}
+                <td>{{i.latitude}}</td>
+              {% endif %}
+
+              {% if i.longitude == None %}
+                <td></td>
+              {% else %}
+                <td>{{i.longitude}}</td>
+              {% endif %}
+              <td>{{i.price}}</td>
+              <td>{{i.endtime}}</td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

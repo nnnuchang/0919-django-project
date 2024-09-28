@@ -1,0 +1,342 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh_TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static "css/search.css" %}">
+    <title>Document</title>
+  </head>
+  <body>
+    {% if request.user.is_authenticated %}
+      <a href="../show">上一頁</a>
+      <br>
+      <br>
+      <label for="uid">UID: </label>
+      <label id="uid">{{show.uid}}</label>
+
+      <br>
+      <label for="title">活動名稱:</label>
+      <input type="text" id="title" value={{show.title}}>
+
+      <br>
+      <label for="category">活動類別:</label>
+      <select id="category">
+        {% for i in category %}
+          {% if i.categoryid == show.category.categoryid %}
+            <option value={{i.categoryid}} selected>{{i.categoryname}}</option>
+          {% else %}
+            <option value={{i.categoryid}}>{{i.categoryname}}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+
+      <br>
+      <label for="showUnit">演出單位:</label>
+      <input type="text" id="showUnit" value={{show.showunit}}>
+      <br>
+      <label for="descriptionFilterHtml">簡介說明:</label>
+      <input type="text" id="descriptionFilterHtml" value={{show.descriptionfilterhtml}}>
+      <br>
+      <label for="discountInfo">折扣資訊:</label>
+      <input type="text" id="discountInfo" value={{show.discountinfo}}>
+      <br>
+      <label for="imageUrl">圖片連結:</label>
+      <input type="text" id="imageUrl" value={{show.imageurl}}>
+      <br>
+      <label for="webSales">售票網址:</label>
+      <input type="text" id="webSales" value={{show.websales}}>
+      <br>
+      <label for="sourceWebPromote">推廣網址:</label>
+      <input type="text" id="sourceWebPromote" value={{show.sourcewebpromote}}>
+      <br>
+      <label for="comment">備註:</label>
+      <input type="text" id="comment" value={{show.comment}}>
+
+      <br>
+      <label for="sourceWebId">來源網站名稱:</label>
+      <select id="sourceWebId">
+        {% for i in sourceWeb %}
+          {% if i.sourcewebid == show.sourcewebid.sourcewebid %}
+            <option value={{i.sourcewebid}} selected>{{i.sourcewebname}}</option>
+          {% else %}
+            <option value={{i.sourcewebid}}>{{i.sourcewebname}}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+
+      <br>
+      <label for="startDate">活動起始日期:</label>
+      <input type="date" id="startDate" value={{startDate}}>
+      <br>
+      <label for="endDate">活動結束日期:</label>
+      <input type="date" id="endDate" value={{endDate}}>
+
+      <br>
+      <button onclick="ok()">修改</button>
+
+      <br>
+      <br>
+      <label>主辦單位:</label>
+      {% if masterUnit|length > 0%}
+        {% for i in masterUnit %}
+          <input type="text" id="master{{i.masterunitid}}" value={{i.unitname}}>
+          <button onclick="masterUpdate({{i.masterunitid}})">修改單位</button>
+        {% endfor %}
+      {% else %}
+        <label>無</label>
+      {% endif %}
+
+      <br>
+      <br>
+      <label>協辦單位:</label>
+      {% if subUnit|length > 0%}
+        {% for i in subUnit %}
+          <input type="text" id="sub{{i.subunitid}}" value={{i.unitname}}>
+          <button onclick="subUpdate({{i.subunitid}})">修改單位</button>
+        {% endfor %}
+      {% else %}
+        <label>無</label>
+      {% endif %}
+
+      <br>
+      <br>
+      <label>贊助單位:</label>
+      {% if supportUnit|length > 0%}
+        {% for i in supportUnit %}
+          <input type="text" id="support{{i.supportunitid}}" value={{i.unitname}}>
+          <button onclick="supportUpdate({{i.supportunitid}})">修改單位</button>
+        {% endfor %}
+      {% else %}
+        <label>無</label>
+      {% endif %}
+
+      <br>
+      <br>
+      <label>其他單位:</label>
+      {% if supportUnit|length > 0%}
+        {% for i in otherUnit %}
+          <input type="text" id="other{{i.otherunitid}}" value={{i.unitname}}>
+          <button onclick="otherUpdate({{i.otherunitid}})">修改單位</button>
+        {% endfor %}
+      {% else %}
+        <label>無</label>
+      {% endif %}
+
+      {% for i in showInfo %}
+        <hr>
+        <br>
+        <label for="time">演出時間:</label>
+        <input type="text" id="time{{i.showinfoid}}" value="{{i.time}}">
+        <br>
+        <label for="location">地點:</label>
+        <input type="text" id="location{{i.showinfoid}}" value={{i.location}}>
+        <br>
+        <label for="locationName">場地名稱:</label>
+        <input type="text" id="locationName{{i.showinfoid}}" value={{i.locationname}}>
+        <br>
+        <label for="onSales">是否售票:</label>
+        <input type="text" id="onSales{{i.showinfoid}}" value={{i.onsales}}>
+        <br>
+        <label for="latitude">緯度:</label>
+        <input type="number"  id="latitude{{i.showinfoid}}" value={{i.latitude}}>
+        <br>
+        <label for="longitude">經度:</label>
+        <input type="number" id="longitude{{i.showinfoid}}" value={{i.longitude}}>
+        <br>
+        <label for="price">售票說明:</label>
+        <input type="text" id="price{{i.showinfoid}}" value={{i.price}}>
+        <br>
+        <label for="endTime">結束時間:</label>
+        <input type="text" id="endTime{{i.showinfoid}}" value={{i.endtime}}>
+
+        <br>
+        <button onclick="showInfoUpdate({{i.showinfoid}})">修改場次資訊</button>
+
+
+      {% endfor %}
+
+    {% else %}
+      <p>
+        請<a href="/login">登入</a>
+      </p>
+    {% endif %}
+    
+    <script>
+      let headers ={
+        'X-CSRFToken': '{{csrf_token}}',
+        'Content-Type': "application/json",
+        'Accept': 'application/json'
+      }
+
+      function ok() {
+        let uid = document.getElementById('uid').innerText;
+        let title = document.getElementById('title').value;
+        let categoryID = document.getElementById('category').value;
+        let showUnit = document.getElementById('showUnit').value;
+        let descriptionFilterHtml = document.getElementById('descriptionFilterHtml').value;
+        let discountInfo = document.getElementById('discountInfo').value;
+        let imageUrl = document.getElementById('imageUrl').value;
+        let webSales = document.getElementById('webSales').value;
+        let sourceWebPromote = document.getElementById('sourceWebPromote').value;
+        let comment = document.getElementById('comment').value;
+        let sourceWebId = document.getElementById('sourceWebId').value;
+        let startDate = document.getElementById('startDate').value;
+        let endDate = document.getElementById('endDate').value;
+
+        let body ={
+          'uid': uid,
+          'title': title,
+          'categoryID': categoryID,
+          'showUnit': showUnit,
+          'descriptionFilterHtml': descriptionFilterHtml,
+          'discountInfo': discountInfo,
+          'imageUrl': imageUrl,
+          'webSales': webSales,
+          'sourceWebPromote': sourceWebPromote,
+          'comment': comment,
+          'sourceWebID': sourceWebId,
+          'startDate': startDate.replace('-', '/'),
+          'endDate': endDate.replace('-', '/')
+        };
+
+        fetch('/operation/editShow/', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(body)
+        })
+        .then(response => response.json())
+        .then(data => alert(data.msg))
+        .catch((error) => {
+          alert(error.message)
+          location.reload();
+        });
+
+      }
+
+      function masterUpdate(unitID){
+        let masterUnitName = document.getElementById('master' + unitID).value;
+
+        let body = {
+          'masterUnitID': unitID,
+          'unitName': masterUnitName
+        };
+
+        fetch('/operation/editMaster/', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(body)
+        })
+        .then(response => response.json())
+        .then(data => alert(data.msg))
+        .catch((error) => {
+          alert(error.message)
+          location.reload();
+        });
+        
+      }
+
+      function subUpdate(unitID){
+        let subUnitName = document.getElementById('sub' + unitID).value;
+        
+        let body = {
+          'subUnitID': unitID,
+          'unitName': subUnitName
+        };
+
+        fetch('/operation/editSub/', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(body)
+        })
+        .then(response => response.json())
+        .then(data => alert(data.msg))
+        .catch((error) => {
+          alert(error.message)
+          location.reload();
+        });
+      }
+
+      function supportUpdate(unitID){
+        let supportUnitName = document.getElementById('support' + unitID).value;
+
+        let body = {
+          'supportUnitID': unitID,
+          'unitName': supportUnitName
+        };
+
+        fetch('/operation/editSupport/', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(body)
+        })
+        .then(response => response.json())
+        .then(data => alert(data.msg))
+        .catch((error) => {
+          alert(error.message)
+          location.reload();
+        });
+      }
+
+      function otherUpdate(unitID){
+        let otherUnitName = document.getElementById('other' + unitID).value;
+        
+        let body = {
+          'otherUnitID': unitID,
+          'unitName': otherUnitName
+        };
+
+        fetch('/operation/editOther/', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(body)
+        })
+        .then(response => response.json())
+        .then(data => alert(data.msg))
+        .catch((error) => {
+          alert(error.message)
+          location.reload();
+        });
+      }
+
+      function showInfoUpdate(showInfoID) {
+        let time = document.getElementById('time' + showInfoID).value;
+        let location = document.getElementById('location' + showInfoID).value;
+        let locationName = document.getElementById('locationName' + showInfoID).value;
+        let onSales = document.getElementById('onSales' + showInfoID).value;
+        let latitude = document.getElementById('latitude' + showInfoID).value;
+        let longitude = document.getElementById('longitude' + showInfoID).value;
+        let price = document.getElementById('price' + showInfoID).value;
+        let endTime = document.getElementById('endTime' + showInfoID).value;
+
+        let body = {
+          'showInfoID': showInfoID,
+          'time': time,
+          'location': location,
+          'locationName': locationName,
+          'onSales': onSales,
+          'latitude': latitude,
+          'longitude': longitude,
+          'price': price,
+          'endTime': endTime
+        };
+
+        console.log(body)
+
+        fetch('/operation/editShowInfo/', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(body)
+        })
+        .then(response => response.json())
+        .then(data => alert(data.msg))
+        .catch((error) => {
+          alert(error.message)
+          location.reload();
+        });
+      }
+
+
+    </script>
+  </body>
+</html>

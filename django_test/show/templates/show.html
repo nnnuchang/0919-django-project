@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh_TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    {% if request.user.is_authenticated %}
+      <p>
+        {{ request.user }} <a href="/logout">登出</a>
+      </p>
+
+      <lable for="uid">輸入UID</lable>
+      <input type="text" id="uid" name="uid" />
+
+      <button onclick="del()">資料刪除</button>
+      <button onclick="search()">資料查詢</button>
+      <button onclick="edit()">資料修改</button>
+    {% else %}
+      <p>
+        請<a href="/login">登入</a>
+      </p>
+
+      <lable for="uid">輸入UID</lable>
+      <input type="text" id="uid" name="uid" />
+      <button>資料查詢</button>
+    {% endif %}
+
+    <br />
+    <br />
+
+    <table>
+      <thead>
+        <tr>
+          <th>UID</th>
+          <th>Title</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in showList %}
+          <tr>
+            <td>
+              <button onclick="pasteUID('{{ i.uid }}')">{{ i.uid }}</button>
+            </td>
+            <td>{{ i.title }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <script>
+      let headers = {
+        'X-CSRFToken': '{{csrf_token}}',
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+      
+      function pasteUID(id) {
+        document.getElementById('uid').value = id
+        document.body.scrollTop = 0
+        document.documentElement.scrollTop = 0
+      }
+      
+      function search() {
+        const uid = document.getElementById('uid').value
+        if (uid == null || uid == '') {
+          alert('請輸入UID')
+        } else {
+          window.location.assign('/operation/search?' + new URLSearchParams({ uid: uid }))
+        }
+      }
+      
+      function edit() {
+        const uid = document.getElementById('uid').value
+        if (uid == null || uid == '') {
+          alert('請輸入UID')
+        } else {
+          window.location.assign('/operation/editPage?' + new URLSearchParams({ uid: uid }))
+        }
+      }
+      
+      function del() {
+        const uid = document.getElementById('uid').value
+      
+        if (confirm('確定要刪除 ' + uid + '嗎?')) {
+          fetch('/operation/delete/', {
+            method: 'DELETE',
+            headers: headers,
+            body: JSON.stringify({
+              uid: uid
+            })
+          })
+            .then((response) => response.json())
+            .then((data) => alert(data.msg))
+            .then(() => location.reload())
+            .catch((error) => {
+              alert(error.message)
+            })
+        }
+      }
+    </script>
+  </body>
+</html>
